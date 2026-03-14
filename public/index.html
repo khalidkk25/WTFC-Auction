@@ -130,6 +130,9 @@
     <div class="row">
         <div class="col-sm-3" style="margin-left: 50px;">
             <h1 style="display: flex; align-items: center; flex-direction: column; gap: 15px; color: white;">Teams</h1>
+            <a href="players.html" class="btn btn-success"
+                style="display: flex; align-items: center; flex-direction: column; gap: 15px; background-color: #585858; border-color: #585858;">
+                View Report</a>
             <ul class="list-group" id="captains" style="font-weight: bolder; font-size: larger;"></ul>
             <br /><br />
             <!-- <a href="report.html" class="btn btn-success"
@@ -220,7 +223,7 @@
 
         const loadPlayers = () => {
 
-            axios.get("players").then(result => {
+            axios.get("/players").then(result => {
                 console.log(result)
                 const players = $("#players")
                 players.empty()
@@ -271,7 +274,7 @@
         // }
 
         const loadCaptains = () => {
-    axios.get("captains").then(result => {
+    axios.get("/captains").then(result => {
         const captains = $("#captains");
         captains.empty();
         const buyingCaption = $("#buyingCaption");
@@ -464,7 +467,7 @@
                 amount
             }
             console.log("body", body)
-            axios.post("buy", body).then(response => {
+            axios.post("/buy", body).then(response => {
                 console.log(response)
                 if (response.status == 200) {
                     $("#message").show()
@@ -513,7 +516,7 @@
         const loadBittingDetails = () => {
             const bittingDetails = $("#bittingDetails")
             bittingDetails.empty()
-            axios.get("bitting").then(result => {
+            axios.get("/bitting").then(result => {
                 console.log(result)
                 const deatils = {}
                 result.data.forEach(element => {

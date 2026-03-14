@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const { Caption, Player, Bitting } = require('./schemas');
 
 // const { MongoClient } = require('mongodb');
-// const uri = "mongodb://localhost:27017/";
+// const uri = "mongodb:///";
 // const client = new MongoClient(uri);
 
 // This tells the app: Use the Cloud DB if available, otherwise use Local
