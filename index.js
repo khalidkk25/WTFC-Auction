@@ -8,9 +8,12 @@ const { Caption, Player, Bitting } = require('./schemas');
 // const uri = "mongodb://localhost:27017/";
 // const client = new MongoClient(uri);
 
-mongoose.connect('mongodb://localhost:27017/football')
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error(err));
+// This tells the app: Use the Cloud DB if available, otherwise use Local
+const dbURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/football';
+
+mongoose.connect(dbURI)
+    .then(() => console.log('✅ MongoDB Connected'))
+    .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 const app = express();
 const PORT = 3000;
@@ -138,3 +141,7 @@ app.get("/bitting", async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
+
+
+
+
