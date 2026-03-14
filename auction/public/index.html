@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Player</title>
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .badge-primary {
+            background-color: #585858;
+        }
+
+        body {
+            background-image: url("/images/page.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .badge-team {
+            color: white;
+            /* Default text for badges */
+            font-weight: bold;
+        }
+
+        #playerImage {
+            width: 100%;
+            aspect-ratio: 4 / 5; /* Forces the 4:5 ratio */
+            object-fit: cover;   /* Prevents shrinking/stretching */
+            border-radius: 8px 8px 0 0; /* Keeps the top corners rounded */
+            display: block;
+        }
+
+        #playerCard {
+            border: none; /* Removes the card border restriction you mentioned */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Optional: adds depth since border is gone */
+            overflow: hidden;
+        }
+
+        .wt-citadel-badge {
+            color: black !important;
+            /* Black text for the white badge */
+        }
+
+        .wt-royale-team {
+            background: #e74c3c;
+            /* Red */
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .wt-mariners-team {
+            background: #000;
+            /* Black */
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .wt-citadel-team {
+            background: #ffffff;
+            /* White */
+            color: black;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        .wt-dunes-team {
+            background: #f1c40f;
+            /* Yellow */
+            color: black;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .wt-groves-team {
+            background: #27ae60;
+            /* Green */
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        #bittingDetails {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">WTFC Auction</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="players.html">Players</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="captain.html">Captains</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>-->
+    <br />
+
+    <!-- <div class="container"> -->
+    <div class="row">
+        <div class="col-sm-3" style="margin-left: 50px;">
+            <h1 style="display: flex; align-items: center; flex-direction: column; gap: 15px; color: white;">Teams</h1>
+            <ul class="list-group" id="captains" style="font-weight: bolder; font-size: larger;"></ul>
+            <br /><br />
+            <!-- <a href="report.html" class="btn btn-success"
+                style="display: flex; align-items: center; flex-direction: column; gap: 15px; background-color: #585858; border-color: #585858;">
+                View Details</a> -->
+
+        </div>
+        <div class="col-sm-6">
+            <div style="display: flex;align-items: center;flex-direction: column;gap: 15px;">
+                <div style="display: flex;column-gap: 10px;">
+                    <button type="button" class="btn btn-primary" id="startBitting"
+                        style="background-color: #00636e; border-color: #ffffff; color: #ffffff;">Start Bitting
+                    </button>
+                    <button type="button" class="btn btn-success" id="randomPlayer"
+                        style="background-color: #ffffff; border-color: #585858; color: #454545; ">Pick Random
+                        Player</button>
+                </div>
+                <div id="message"></div>
+                <div id="playerCard" class="card" style="width: 18rem;">
+                    <img id="playerImage" src="./images/image.png" class="card-img-top" alt="No Photo">
+                    <div class="card-body" style="text-align: center;">
+                        <h5 class="card-title" id="playerName" style="font-weight: bold;">Card title</h5>
+                        <h5 class="card-subtitle" id="playerDesignation" style="font-weight: bold;"></h5>
+                        <div class="card-text">
+                            <div> Score : <span id="playerScore" style="font-weight: bold;">10</span> </div>
+                            <div id="actions">
+                                <!-- <div id="playerTimer" style="font-size: 50px;"> 15 </div> -->
+                                <div id="buyStatus">
+                                    <select id="buyingCaption"></select>
+                                    <button id="Confirm" class="btn btn-success">Confirm</button>
+                                </div>
+                                <div id="preBuyStatus">
+                                    <input type="number" id="addpointInput" value="0" size="2" />
+                                    <button id="buy" class="btn btn-success">BUY</button>
+                                    <!-- <button id="addPoint" class="btn btn-primary">+2</button> -->
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="col-sm-3" style="margin-left: -150px;">
+            <h1 style="display: flex; align-items: center; flex-direction: column; gap: 15px; color: white;">Players
+            </h1>
+            <div>
+
+                <ul class="list-group" id="players" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                </ul>
+            </div>
+        </div>
+        <div class="container"
+            style="margin: 100px 0px 50px 100px; display: flex; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; gap: 15px;"
+            id="bittingDetails">
+        </div>
+
+    </div>
+
+    <!-- ---------------------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------- -->
+    <!-- </div> -->
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <script>
+        var GLOBAL_DATA = { timeout: 15, current: 0, timer: undefined, skip: [] }
+        function getRandomIntInclusive(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min)) + min; // The maximum is inclusive and the minimum is inclusive
+        }
+
+        const loadPlayers = () => {
+
+            axios.get("players").then(result => {
+                console.log(result)
+                const players = $("#players")
+                players.empty()
+                if (result.status == 200) {
+                    GLOBAL_DATA.players = result.data;
+                    GLOBAL_DATA.availablePlayers = []
+                    GLOBAL_DATA.players.forEach(element => {
+                        if (element.sold !== true) {
+                            GLOBAL_DATA.availablePlayers.push(element)
+                            players.append(` 
+                            <li class="list-group-item d-flex justify-content-between align-items-center" id="captain_${element._id}">
+                            ${element.name} | ${element.designation}
+                            <span class="badge badge-primary badge-pill">${element.score}</span>
+                            </li>`)
+                        }
+                    });
+                }
+            }).catch(err => {
+                console.log("Axios error", err)
+            })
+
+
+        }
+
+        // const loadCaptains = () => {
+        //     axios.get("captains").then(result => {
+        //         console.log(result)
+        //         const captains = $("#captains")
+        //         captains.empty()
+        //         const buyingCaption = $("#buyingCaption");
+        //         buyingCaption.empty()
+        //         if (result.status == 200) {
+        //             GLOBAL_DATA.captains = result.data;
+        //             GLOBAL_DATA.captains.forEach(element => {
+        //                 if (element.score > 0) {
+        //                     buyingCaption.append(`<option value="${element._id}">${element.name} (${element.score}) </option>`)
+        //                     captains.append(` 
+        //                 <li class="list-group-item d-flex justify-content-between align-items-center" id="captain_${element._id}">
+        //                 ${element.name}
+        //                 <span class="badge badge-primary badge-pill">${element.score}</span>
+        //                 </li>`)
+        //                 }
+        //             });
+        //         }
+        //     }).catch(err => {
+        //         console.log("Axios error", err)
+        //     })
+        // }
+
+        const loadCaptains = () => {
+    axios.get("captains").then(result => {
+        const captains = $("#captains");
+        captains.empty();
+        const buyingCaption = $("#buyingCaption");
+        buyingCaption.empty();
+
+        // Color mapping based on team names
+        const teamColors = {
+            "wt royale": "#e74c3c",   // Red
+            "wt mariners": "#000000", // Black
+            "wt citadel": "#ffffff",  // White
+            "wt dunes": "#f1c40f",    // Yellow
+            "wt groves": "#27ae60"    // Green
+        };
+
+        if (result.status == 200) {
+            GLOBAL_DATA.captains = result.data;
+            GLOBAL_DATA.captains.forEach(element => {
+                const teamNameLower = element.name.toLowerCase();
+                const bgColor = teamColors[teamNameLower] || "#585858"; // Fallback to grey
+                const isCitadel = teamNameLower === "wt citadel";
+
+                if (element.score > 0) {
+                    buyingCaption.append(`<option value="${element._id}">${element.name} (${element.score}) </option>`);
+                    
+                    captains.append(` 
+                        <li class="list-group-item d-flex justify-content-between align-items-center" id="captain_${element._id}">
+                            ${element.name}
+                            <span class="badge badge-pill badge-team ${isCitadel ? 'wt-citadel-badge' : ''}" 
+                                  style="background-color: ${bgColor}; ${isCitadel ? 'border: 1px solid #ccc;' : ''}">
+                                ${element.score}
+                            </span>
+                        </li>`);
+                }
+            });
+        }
+    }).catch(err => {
+        console.log("Axios error", err);
+    });
+}
+
+        const timerFunction = () => {
+            GLOBAL_DATA.current--;
+            // $("#playerTimer").css("font-size", '50px')
+            // $("#playerTimer").text(GLOBAL_DATA.current);
+            if (GLOBAL_DATA.current == 0) {
+                $("#message").html(`
+                <div class="alert alert-danger" role="alert">
+                Time Out 
+                </div>`)
+                $("#randomPlayer").show()
+                $("#randomPlayer").text("Pick Random Player")
+                $("#randomPlayer").attr("class", "btn btn-success");
+                $("#playerCard").hide()
+                $("#startBitting").hide()
+            }
+
+        }
+
+
+        const randomPlayerSelect = () => {
+
+            if (GLOBAL_DATA.timer) {
+                clearInterval(GLOBAL_DATA.timer)
+            }
+
+            if ($("#randomPlayer").text() == "Skip") {
+
+                // add to skipped list
+                GLOBAL_DATA.skip.push(GLOBAL_DATA.selectedPlayer)
+
+                // remove from available players
+                GLOBAL_DATA.availablePlayers = GLOBAL_DATA.availablePlayers.filter(
+                    item => item._id != GLOBAL_DATA.selectedPlayer._id
+                )
+
+                // if no players left, bring skipped players back
+                if (GLOBAL_DATA.availablePlayers.length === 0) {
+                    GLOBAL_DATA.availablePlayers = [...GLOBAL_DATA.skip]
+                    GLOBAL_DATA.skip = []
+                }
+            }
+
+            $("#playerCard").hide()
+            $("#startBitting").hide()
+            $("#message").empty()
+            if (GLOBAL_DATA.availablePlayers.length == 0) {
+                $("#message").html(`
+                <div class="alert alert-danger" role="alert">
+                All Players Sold Out
+                </div>`)
+            }
+            const index = getRandomIntInclusive(0, GLOBAL_DATA.availablePlayers.length)
+            const player = GLOBAL_DATA.availablePlayers[index];
+            GLOBAL_DATA.selectedPlayer = player
+            console.log(GLOBAL_DATA.selectedPlayer)
+
+            $("#playerCard").show()
+            $("#startBitting").show()
+            $("#playerImage").attr("src", player.image || './images/image.png')
+            $("#playerName").text(player.name)
+            $("#playerDesignation").text(player.designation)
+            $("#playerScore").text(player.score || 0)
+            // $("#playerTimer").text(GLOBAL_DATA.timeout)
+            GLOBAL_DATA.current = GLOBAL_DATA.timeout;
+            $("#actions").hide()
+            $("#randomPlayer").text("Skip")
+            $("#randomPlayer").attr("class", "btn btn-danger")
+
+        }
+        const startBittingClick = () => {
+            $("#message").empty()
+            $("#startBitting").hide();
+            // $("#randomPlayer").text("Pick Random Player")
+            // $("#randomPlayer").attr("class", "btn btn-success");
+            // $("#randomPlayer").hide()
+            $("#actions").show()
+            $("#buyStatus").hide()
+            $("#preBuyStatus").show()
+            $("#playerScore").text(GLOBAL_DATA.selectedPlayer.score)
+            $("#addpointInput").val(GLOBAL_DATA.selectedPlayer.score)
+            GLOBAL_DATA.selectedPlayer.amount = GLOBAL_DATA.selectedPlayer.score
+            // GLOBAL_DATA.timer = setInterval(timerFunction, 1500)
+        }
+        const addPointClick = () => {
+            if (GLOBAL_DATA.timer) {
+                clearInterval(GLOBAL_DATA.timer)
+            }
+            GLOBAL_DATA.current = GLOBAL_DATA.timeout;
+            // $("#playerTimer").text(GLOBAL_DATA.current);
+            const score = parseInt($("#playerScore").text())
+            GLOBAL_DATA.selectedPlayer.score = score + 2
+            $("#playerScore").text(GLOBAL_DATA.selectedPlayer.score)
+            // GLOBAL_DATA.timer = setInterval(timerFunction, 1500)
+        }
+        const buyPlayerClick = () => {
+            if (GLOBAL_DATA.timer) {
+                clearInterval(GLOBAL_DATA.timer)
+            }
+            $("#buyStatus").show()
+            $("#preBuyStatus").hide()
+            $("#startBitting").show();
+            $("#randomPlayer").show()
+            $("#randomPlayer").text("Skip")
+            $("#randomPlayer").attr("class", "btn btn-danger");
+            // $("#playerTimer").css("font-size", '25px')
+            // $("#playerTimer").text(`Bitting : ${GLOBAL_DATA.selectedPlayer.score}`);
+        }
+        const buyConfirmPlayerClick = () => {
+            const amount = GLOBAL_DATA.selectedPlayer.amount
+            const buyingCaption = $("#buyingCaption").val()
+            const captain = GLOBAL_DATA.captains.find(item => item._id == buyingCaption);
+            // count how many players this captain already bought
+            const captainPlayers = $("#bittingDetails")
+                .find(`h3:contains(${captain.name})`)
+                .next("ul")
+                .find("li").length || 0;
+
+            // total auction players required
+            const totalRequiredPlayers = 5;
+
+            // remaining players after this purchase
+            const remainingPlayers = Math.max(0, totalRequiredPlayers - (captainPlayers + 1));
+
+            // remaining balance after buying
+            const remainingBalance = captain.score - amount;
+
+            // minimum balance needed to buy remaining players at base price
+            const minimumRequired = remainingPlayers * 5;
+
+            if (remainingBalance < minimumRequired) {
+                $("#message").show()
+                $("#message").html(`
+        <div class="alert alert-danger" role="alert">
+        ${captain.name} cannot buy this player. Minimum balance required for remaining players is ${minimumRequired}.
+        </div>
+    `)
+                return
+            }
+            if (captain.score < amount) {
+                $("#message").show()
+                $("#message").html(`
+                <div class="alert alert-danger" role="alert">
+               captain Does not have sufficient amount to buy the player
+                </div>`)
+                return
+            }
+            const body = {
+                captain: buyingCaption,
+                player: GLOBAL_DATA.selectedPlayer._id,
+                amount
+            }
+            console.log("body", body)
+            axios.post("buy", body).then(response => {
+                console.log(response)
+                if (response.status == 200) {
+                    $("#message").show()
+                    $("#message").html(`
+                <div class="alert alert-success" role="alert">
+               ${GLOBAL_DATA.selectedPlayer.name}  has been bought by ${captain.name} for an amount of ${amount}.
+                </div>`)
+                    $("#randomPlayer").show()
+                    $("#randomPlayer").text("Pick Random Player")
+                    $("#randomPlayer").attr("class", "btn btn-success");
+                    $("#playerCard").hide()
+                    $("#startBitting").hide()
+                    loadPlayers()
+                    loadCaptains()
+                    loadBittingDetails()
+
+                }
+
+            }).catch(err => {
+                console.log("Player Buy error", err)
+            })
+        }
+
+        $(document).on("click", "#Confirm", () => {
+            buyConfirmPlayerClick()
+        })
+
+        $(document).on("click", "#buy", () => {
+            buyPlayerClick()
+        })
+        $(document).on("click", "#addPoint", () => {
+            addPointClick()
+        })
+        $(document).on("click", "#startBitting", () => {
+            startBittingClick()
+        })
+        $(document).on("click", "#randomPlayer", () => {
+            randomPlayerSelect()
+        })
+
+        $(document).on("change", "#addpointInput", () => {
+            GLOBAL_DATA.selectedPlayer.amount = parseInt($("#addpointInput").val())
+            $("#playerScore").text(GLOBAL_DATA.selectedPlayer.amount)
+        })
+
+        const loadBittingDetails = () => {
+            const bittingDetails = $("#bittingDetails")
+            bittingDetails.empty()
+            axios.get("bitting").then(result => {
+                console.log(result)
+                const deatils = {}
+                result.data.forEach(element => {
+                    console.log("element", element)
+                    const captain = element["captain"]
+                    console.log("captain", captain)
+                    if (!deatils[captain]) {
+                        deatils[captain] = {
+                            captionDetails: element["captionDetails"],
+                            playerDetails: []
+                        }
+                    }
+                    console.log("deatils[captain]", deatils[captain])
+
+                    deatils[captain]["playerDetails"].push({ ...element.playerDetails, amount: element.amount })
+                });
+                console.log("details", deatils)
+                for (const deatil of Object.values(deatils)) {
+                    const teamClassName = deatil.captionDetails.name.toLowerCase().replace(/\s+/g, '-') + '-team';
+
+                    bittingDetails.append(`
+    <div>
+        <h3 class="${teamClassName}">${deatil.captionDetails.name}</h3>
+        <ul class="list-group">
+            ${deatil.playerDetails.map(player => `<li class="list-group-item">${player.name} | ${player.designation} - ${player.amount}</li>`).join("")}
+        </ul>
+    </div>
+`);
+
+                }
+
+            }).catch(err => {
+                console.log("Axios error", err)
+            })
+        }
+
+
+        $(document).ready(() => {
+            loadCaptains()
+            loadPlayers()
+            loadBittingDetails()
+            $("#playerCard").hide()
+            $("#startBitting").hide()
+            // $("#startBitting").hide()
+        })
+    </script>
+
+</body>
+
+</html>

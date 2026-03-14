@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Player</title>
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">WTFC Auction</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="players.html">Players</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="captain.html">Captains</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <br />
+
+    <div class="container">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Create New Player
+        </button>
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <form id="uploadForm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Player</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container container-center">
+                                <div class="row ">
+                                    <div class="col">
+                                        <center>
+                                            <img id="previewHolder" src="images/image.png" alt="No Images"
+                                                class="img-thumbnail" style="max-width: 250px; max-height: 250px;">
+                                            <br /><br />
+                                            <input class="form-control form-control-sm" id="imageInput" type="file">
+
+                                        </center>
+                                    </div>
+                                    <div class="col">
+                                        <input type="hidden" id="rowId" />
+                                        <div class="mb-12">
+                                            <label for="exampleFormControlInput1" class="form-label">Name</label>
+                                            <input type="text" class="form-control" id="name">
+                                        </div>
+                                        <div class="mb-12">
+                                            <label for="exampleFormControlInput2" class="form-label">Designation</label>
+                                            <input type="text" class="form-control" id="designation">
+                                        </div>
+                                        <div class="mb-12">
+                                            <label for="exampleFormControlInput3" class="form-label">Score Point</label>
+                                            <input type="number" class="form-control" id="score" value="0">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" id="save" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="container" id="details">
+            loading...
+        </div>
+
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#imageInput').on('change', function () {
+                var input = this;
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        $('#previewHolder')
+                            .attr('src', e.target.result)
+                            .show(); // Show the image once loaded
+                    };
+
+                    reader.readAsDataURL(input.files[0]); // Read the file
+                }
+            });
+        });
+
+        const loadData = async () => {
+            const container = $("#details")
+            container.html("loading...")
+            axios.get("players").then(result => {
+                console.log(result)
+                if (result.status == 200) {
+                    container.empty()
+                    let html = `<div class="row">`
+                    result.data.forEach(element => {
+                        html += `
+                        <div class="container mt-3 col-sm-3">
+                <div class="card shadow-sm" style="width: 18rem;">
+                    <img src="${element.image || './images/image.png'}" class="card-img-top" alt="Profile Image">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${element.name}</h5>
+                        <p class="card-text"> ${element.designation}</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button  rowId="${element._id}" class="btn btn-outline-primary edit">Edit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`
+                    });
+                    html += "</div>"
+                    container.append(html)
+
+                } else {
+                    container.html("No Record.")
+                }
+            }).catch(err => {
+                console.log("axios error", err)
+                container.html("No Record.")
+            })
+        }
+        $(document).ready(() => {
+            loadData()
+        })
+
+        $(document).on('click', '.edit', (e) => {
+            const target = $(e.target)
+            console.log(target)
+            console.log(target.attr("rowId"))
+            const rowId = target.attr("rowId")
+            axios.get(`player/${rowId}`).then(result => {
+                console.log(result)
+                if (result.status == 200) { }
+                $('#exampleModal').modal('show');
+                const { name, designation, score, image } = result.data;
+                $("#rowId").val(rowId)
+                $("#name").val(name)
+                $("#designation").val(designation)
+                $("#score").val(score)
+                $("#previewHolder").attr("src", image)
+
+            }).catch(err => {
+                console.log("axios error", err)
+
+            })
+        })
+
+        const resetFormData = () => {
+            $("#rowId").val("")
+            $("#name").val("")
+            $("#designation").val("")
+            $("#score").val("")
+            $("#previewHolder").attr("src", "./images/image.png")
+            $("#imageInput").val("");
+        }
+
+        $(document).on('click', '#save', (e) => {
+            const rowId = $("#rowId").val()
+            const name = $("#name").val()
+            const designation = $("#designation").val()
+            const score = $("#score").val()
+            const previewHolder = $("#previewHolder").attr("src")
+            const imageInput = $("#imageInput")[0].files.length;
+            const method = rowId ? 'put' : 'post';
+            console.log("method", method, "url", `player/${rowId}`)
+
+
+            if (name && designation && score) {
+                const body = { name, designation, score, image: imageInput && previewHolder ? previewHolder : undefined }
+                console.log("body", body)
+                axios[method](`player/${rowId}`, body).then(result => {
+                    console.log(result)
+                    resetFormData();
+                    $('#exampleModal').modal('hide');
+                    loadData()
+                }).catch(err => {
+                    console.log("error", err)
+                })
+            }
+
+
+
+
+            console.log({ rowId, name, designation, score, previewHolder })
+        })
+    </script>
+</body>
+
+</html>
